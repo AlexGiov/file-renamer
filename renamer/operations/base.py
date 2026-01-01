@@ -125,11 +125,40 @@ class BaseFileRenamer(ABC):
             new_path = parent / safe_name
             
             if self._file_ops.file_exists(new_path):
-                # Collision detected - add hash suffix
-                base, ext = self._sanitizer.split_filename(safe_name)
-                safe_name = self._sanitizer.add_collision_suffix(base, ext, filename)
-                new_path = parent / safe_name
-                self._log_verbose(f"Collision handled: {safe_name}")
+                # Possible collision - verify if it's the same file
+                is_same_file = False
+                
+                # Quick check 1: Compare resolved paths (works on case-insensitive FS)
+                try:
+                    is_same_file = file_path.resolve() == new_path.resolve()
+                except Exception as e:
+                    self._log_verbose(f"Path resolution failed: {e}")
+                
+                # Check 2: Compare file hashes for certainty (works on case-sensitive FS)
+                if not is_same_file:
+                    try:
+                        old_hash = self._hasher.compute_hash(file_path)
+                        new_hash = self._hasher.compute_hash(new_path)
+                        is_same_file = (old_hash == new_hash)
+                        self._log_verbose(f"Hash comparison: same={is_same_file}")
+                    except Exception as e:
+                        self._log_verbose(f"Hash comparison failed: {e}")
+                
+                if is_same_file:
+                    # Same file (case change only) - proceed with rename
+                    self._log_verbose(f"Same file detected, case change only: {filename} -> {safe_name}")
+                else:
+                    # Different file exists - check if already renamed via sidecar
+                    existing_sidecar = self._sidecar_writer.read_sidecar(new_path)
+                    if existing_sidecar and existing_sidecar.original_filename == filename:
+                        self._log_verbose(f"File already renamed previously: {filename}")
+                        return RenameResult.skipped(file_path, "Already renamed")
+                    
+                    # True collision - add hash suffix
+                    base, ext = self._sanitizer.split_filename(safe_name)
+                    safe_name = self._sanitizer.add_collision_suffix(base, ext, filename)
+                    new_path = parent / safe_name
+                    self._log_verbose(f"Collision detected, suffix added: {safe_name}")
             
             # Dry run - stop here
             if dry_run:
