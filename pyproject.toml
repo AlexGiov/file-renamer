@@ -4,7 +4,7 @@ build-backend = "setuptools.build_backend"
 
 [project]
 name = "file-renamer"
-version = "1.0.0"
+version = "1.0.2"
 description = "Cross-platform safe file renaming tool with local and remote support"
 authors = [
     {name = "Your Name", email = "your.email@example.com"}
@@ -42,10 +42,10 @@ dev = [
 file-renamer = "renamer_cli:main"
 
 [project.urls]
-Homepage = "https://github.com/yourusername/file-renamer"
-Documentation = "https://github.com/yourusername/file-renamer#readme"
-Repository = "https://github.com/yourusername/file-renamer"
-Issues = "https://github.com/yourusername/file-renamer/issues"
+Homepage = "https://github.com/AlexGiov/file-renamer"
+Documentation = "https://github.com/AlexGiov/file-renamer#readme"
+Repository = "https://github.com/AlexGiov/file-renamer"
+Issues = "https://github.com/AlexGiov/file-renamer/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]
