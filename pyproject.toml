@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_backend"
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [project]
-name = "file-renamer"
-version = "1.0.2"
+name = "renamer"
+version = "1.0.3"
 description = "Cross-platform safe file renaming tool with local and remote support"
 authors = [
     {name = "Your Name", email = "your.email@example.com"}
